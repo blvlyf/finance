@@ -134,7 +134,8 @@ if(b.dataset.open){const d=b.closest('.dd');b.setAttribute('aria-expanded',d.cla
 if(b.dataset.new){const n=(prompt('New category name')||'').trim();if(n){rd();v.cat=n;draw()}return}
 const x=b.dataset.x;if(x==='cancel')mclose();
 if(x==='del'&&confirm('Delete this entry?')){mclose();S.tx=S.tx.filter(t=>t.id!==v.id);save()}
-if(x==='save'){rd();if(!(v.amt>0))return alert('Enter an amount.');if((v.k==='save'||v.k==='debt')&&!v.tgt)return alert(v.k==='save'?'Add a goal in Plan first.':'No open debts.');
+if(x==='save'){rd();if(v.amt<0){if(e)return alert('Edit entries with a positive amount.');if(!confirm('Negative amount: is this a loan you need to repay?\n\nOK = add to Debt\nCancel = go back and fix the amount'))return;const w=(prompt('Who is the loan from?',(v.note||'').trim()||(v.k==='inc'||v.k==='exp'?v.cat:'')||'')||'').trim();if(!w)return;const A=Math.abs(v.amt),id=uid();S.debts.push({id,who:w,amt:A,due:''});S.tx.push({id:uid(),k:'inc',d:v.d,amt:A,cat:'Loan',note:'Loan: '+w,tgt:'',acc:S.acc.some(a=>a.id===v.acc)?v.acc:''});mclose();save();toast('Added to Debt: '+w+' '+num(A));return}
+if(!(v.amt>0))return alert('Enter an amount.');if((v.k==='save'||v.k==='debt')&&!v.tgt)return alert(v.k==='save'?'Add a goal in Plan first.':'No open debts.');
 const t={id:v.id||uid(),k:v.k,d:v.d,amt:v.amt,cat:v.k==='exp'||v.k==='inc'?v.cat:'',note:v.note.trim(),tgt:v.k==='save'||v.k==='debt'?v.tgt:'',acc:S.acc.some(a=>a.id===v.acc)?v.acc:''};
 if(v.k==='exp'&&!BASE.includes(t.cat)&&!S.cats.includes(t.cat))S.cats.push(t.cat);
 mclose();if(e)S.tx[S.tx.findIndex(y=>y.id===v.id)]=t;else S.tx.push(t);save();if(!e&&t.k==='inc'&&t.cat!=='Loan')toast('Shared: '+BK.map(([k,n])=>n+' '+num(t.amt*(+S.split[k]||0)/100)).join(' · '))}};
