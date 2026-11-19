@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf8f4"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png"><title>The V Fi</title>
+<style>
+:root{--bg:#faf8f4;--ink:#1d1a1b;--mut:#5c5557;--line:#e6e0d8;--sf:#f1ece4;--br:#7d1230;--onbr:#fff;--pos:#17603f;--neg:#a32a22}
+@media(prefers-color-scheme:dark){:root{--bg:#141011;--ink:#f4efef;--mut:#b9afb1;--line:#2d2527;--sf:#1e1819;--br:#e8899f;--onbr:#141011;--pos:#6fd0a0;--neg:#ff8f85}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding-top:env(safe-area-inset-top);padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+main{max-width:560px;margin:0 auto;padding:0 22px 24px}
+button,input{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--br);outline-offset:2px}
+.wm{display:flex;align-items:flex-end;gap:6px;padding:22px 0 6px;font:15px/1 "Courier New",Courier,monospace;letter-spacing:.06em}.wm svg{height:34px;width:auto}
+.mn{display:flex;align-items:center;justify-content:space-between;margin:10px 0 4px}.mn span{color:var(--mut)}
+.mn button,.ghost{background:none;border:0;color:var(--ink);min-width:44px;min-height:44px;font-size:22px;border-radius:12px}
+.lab{color:var(--mut);font-size:14px;margin:26px 0 8px}
+.big{font:400 clamp(36px,12vw,52px)/1.1 Georgia,"Times New Roman",serif;letter-spacing:-.02em}.big small{font-size:.38em;letter-spacing:0;color:var(--mut);margin-right:6px}
+.pair{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 0}.pair div span{display:block;color:var(--mut);font-size:14px}.pair b{font-weight:600;font-size:17px}
+.pos{color:var(--pos)}.neg{color:var(--neg)}
+.bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0 4px}.bar i{display:block;height:100%;background:var(--br)}.bar.over i{background:var(--neg)}
+.row{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:14px 0;min-height:52px}
+.row .t{display:flex;justify-content:space-between;gap:12px}.row .s{color:var(--mut);font-size:14px}
+.empty{margin:56px 0;text-align:center;color:var(--mut)}.empty b{display:block;color:var(--ink);font:400 22px Georgia,serif;margin-bottom:8px}
+.seg{display:flex;gap:4px;background:var(--sf);border-radius:14px;padding:4px;margin:14px 0 6px}.seg button{flex:1;border:0;background:none;padding:10px 0;border-radius:11px;color:var(--mut)}.seg .on{background:var(--bg);color:var(--ink);font-weight:600;box-shadow:0 0 0 1px var(--line)}
+.btn{border:1px solid var(--line);background:none;border-radius:14px;padding:12px 18px;min-height:46px}.btn.pri{background:var(--br);border-color:var(--br);color:var(--onbr);font-weight:600}.btn.red{color:var(--neg)}.btn.sm{min-height:40px;padding:8px 14px;font-size:15px}
+.acts{display:flex;gap:10px;margin:22px 0 0;flex-wrap:wrap}.acts .btn{flex:1;white-space:nowrap}
+h3{font:400 22px Georgia,serif;margin:0 0 14px}
+label{display:block;color:var(--mut);font-size:14px;margin:14px 0}
+input{width:100%;margin-top:6px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:16px}
+input[name=amt]{font:400 34px Georgia,serif;text-align:center;border:0;border-bottom:1px solid var(--line);border-radius:0;margin:6px 0 0;padding:10px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.chip{border:1px solid var(--line);background:none;border-radius:99px;padding:9px 15px;min-height:42px}.chip.on{background:var(--br);border-color:var(--br);color:var(--onbr);font-weight:600}
+.hint{color:var(--mut);font-size:14px;margin:8px 0 0}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;background:var(--bg);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom))}
+nav button{flex:1;background:none;border:0;min-height:48px;color:var(--mut);font-size:14px}nav button[aria-current]{color:var(--br);font-weight:700}
+nav .plus{flex:0 0 56px;height:56px;border-radius:50%;background:var(--br);color:var(--onbr);font-size:30px;line-height:1;margin:0 6px}
+#modal{display:none;position:fixed;inset:0;background:#0006;z-index:9;align-items:flex-end}#modal.on{display:flex}
+.sheet{width:100%;max-width:560px;margin:0 auto;max-height:92vh;overflow:auto;background:var(--bg);border-radius:24px 24px 0 0;padding:22px 22px calc(22px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.9,.25,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+#lock{display:none;position:fixed;inset:0;background:var(--bg);z-index:20;align-items:center;justify-content:center;flex-direction:column;gap:14px}#lock.on{display:flex}#lock input{width:180px;text-align:center;font-size:20px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<main id="app"></main><nav id="nav"></nav><div id="modal"></div>
+<div id="lock"><div class="wm" id="lockwm"></div><input id="pin" type="password" inputmode="numeric" placeholder="PIN" aria-label="PIN"><button class="btn pri" onclick="unlock()">Unlock</button></div>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),uid=()=>Math.random().toString(36).slice(2,10);
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),today=()=>dstr(new Date());
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const sum=(a,f=x=>x.amt)=>a.reduce((s,x)=>s+(+f(x)||0),0),pc=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0;
+const DEF=()=>({set:{cur:'UGX',day:1,cash0:0,pin:'',bk:''},tx:[],goals:[],debts:[],bud:{},cats:[]});
+const BASE=['Food','Transport','Rent','Bills','Health','Giving','Fun','Other'],SRC=['Salary','Business','Gift','Loan','Other'],KN={exp:'Spent',inc:'Received',save:'Saved',debt:'Repaid'};
+let S=DEF(),tab='home',sub='bud',sel=0,locked=false,qs='';
+const num=n=>Math.round(Math.abs(n||0)).toLocaleString('en-US'),fmt=n=>(n<0?'−':'')+S.set.cur+' '+num(n);
+/* storage */
+const idb=()=>new Promise((ok,no)=>{const r=indexedDB.open('vfi',1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onsuccess=()=>ok(r.result);r.onerror=no});
+const load=async()=>{const d=await idb();return new Promise(r=>{const q=d.transaction('k').objectStore('k').get('s');q.onsuccess=()=>r(q.result);q.onerror=()=>r()})};
+async function save(){render();const d=await idb();d.transaction('k','readwrite').objectStore('k').put(S,'s')}
+/* months (a month starts on the payday you choose, default the 1st) */
+const D=()=>Math.min(28,Math.max(1,+S.set.day||1));
+const cyc=d=>{let[y,m,dd]=d.split('-').map(Number);if(dd<D()){m--;if(m<1){m=12;y--}}return y*12+m-1};
+const cl=c=>new Date(Math.floor(c/12),c%12,1).toLocaleString('en',{month:'long',year:'numeric'});
+/* numbers */
+const T=(k,c)=>S.tx.filter(t=>t.k===k&&(c==null||cyc(t.d)===c));
+const cash=()=>+S.set.cash0+sum(T('inc'))-sum(T('exp'))-sum(T('save'))-sum(T('debt'));
+const gS=g=>(+g.base||0)+sum(T('save').filter(x=>x.tgt===g.id)),saved=()=>sum(S.goals,g=>g.base)+sum(T('save'));
+const dBal=d=>Math.max(0,d.amt-sum(T('debt').filter(x=>x.tgt===d.id))),owed=()=>sum(S.debts,dBal);
+const spentIn=(c,n)=>sum(T('exp',c).filter(t=>t.cat===n));
+const mark=`<svg viewBox="0 0 40 48" aria-hidden="true"><path d="M6 6 19 39q2 4 4 0L34 2" fill="none" stroke="var(--br)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 22v25M11 24h14" stroke="var(--ink)" stroke-width="1.2"/></svg>`;
+const wm=`<span>THE</span>${mark}<span>FI</span>`;$('#lockwm').innerHTML=wm;
+const head=()=>`<div class="wm" aria-label="The V Fi">${wm}</div>`;
+const mn=c=>`<div class=mn><button onclick="sel--;render()" aria-label="Previous month">‹</button><span>${cl(c)}</span><button onclick="sel++;render()" aria-label="Next month">›</button></div>`;
+const bar=(p,over)=>`<div class="bar ${over?'over':''}"><i style="width:${p}%"></i></div>`;
+const li=t=>`<button class=row onclick="edit('${t.id}')"><div class=t><span>${esc(t.note||t.cat||KN[t.k])}</span><b class="${t.k==='inc'?'pos':''}">${t.k==='inc'?'+':'−'}${num(t.amt)}</b></div><div class=s>${t.d} · ${KN[t.k]}${t.cat?' · '+esc(t.cat):''}</div></button>`;
+const empty=(a,b)=>`<div class=empty><b>${a}</b>${b}</div>`;
+/* views */
+function home(){const c=sel,I=sum(T('inc',c)),X=sum(T('exp',c)),sv=saved(),od=owed(),bs=Object.keys(S.bud),mt=S.tx.filter(t=>cyc(t.d)===c).sort((a,b)=>a.d<b.d?1:-1);
+return head()+mn(c)+`<div class=lab>Available</div><div class=big><small>${esc(S.set.cur)}</small>${cash()<0?'−':''}${num(cash())}</div>`+
+(S.tx.length?`<div class=pair><div><span>Received</span><b class=pos>${num(I)}</b></div><div><span>Spent</span><b>${num(X)}</b></div>${sv>0?`<div><span>Saved</span><b>${num(sv)}</b></div>`:''}${od>0?`<div><span>Owed</span><b class=neg>${num(od)}</b></div>`:''}</div>`:'')+
+(bs.length?`<div class=lab>Budgets</div>`+bs.map(n=>{const b=+S.bud[n],a=spentIn(c,n);return`<div style="padding:8px 0"><div class=t style="display:flex;justify-content:space-between"><span>${esc(n)}</span><span class="s ${a>b?'neg':''}" style="font-size:14px">${a>b?num(a-b)+' over':num(b-a)+' left'}</span></div>${bar(pc(a,b),a>b)}</div>`}).join(''):'')+
+(S.goals.length?`<div class=lab>Goals</div>`+S.goals.map(g=>`<div style="padding:8px 0"><div style="display:flex;justify-content:space-between"><span>${esc(g.name)}</span><span style="font-size:14px;color:var(--mut)">${g.target?pc(gS(g),g.target)+'%':num(gS(g))}</span></div>${g.target?bar(pc(gS(g),g.target)):''}</div>`).join(''):'')+
+(mt.length?`<div class=lab>Recent</div>`+mt.slice(0,5).map(li).join(''):'')+
+(!S.tx.length&&!+S.set.cash0?empty('A clean slate','Tap + to add your first entry. Everything here comes only from what you enter.'):'')}
+function act(){const c=sel,f=S.tx.filter(t=>cyc(t.d)===c&&(!qs||(t.note+t.cat+KN[t.k]).toLowerCase().includes(qs.toLowerCase()))).sort((a,b)=>a.d<b.d?1:-1);
+return head()+mn(c)+(S.tx.length>6?`<input placeholder="Search" aria-label="Search entries" value="${esc(qs)}" onchange="qs=this.value;render()">`:'')+(f.map(li).join('')||empty('Nothing yet','No entries in this month.'))}
+function plan(){const seg=`<div class=seg>${[['bud','Budgets'],['goal','Goals'],['debt','Debts']].map(([k,l])=>`<button class="${sub===k?'on':''}" onclick="sub='${k}';render()">${l}</button>`).join('')}</div>`,c=nowSel();let b='';
+if(sub==='bud'){const bs=Object.keys(S.bud);b=bs.map(n=>{const bd=+S.bud[n],a=spentIn(c,n);return`<button class=row onclick="setB('${esc(n).replace(/'/g,"\\'")}')"><div class=t><span>${esc(n)}</span><span class=s>${num(a)} / ${num(bd)}</span></div>${bar(pc(a,bd),a>bd)}</button>`}).join('')||empty('No budgets','Set a monthly limit for any category you want to watch.');b+=`<div class=acts><button class="btn pri" onclick="setB()">Add budget</button></div>`}
+if(sub==='goal'){b=S.goals.map(g=>`<div class=row style="cursor:default"><div class=t><b>${esc(g.name)}</b><button class="ghost" style="min-width:auto;min-height:auto;font-size:15px;color:var(--br)" onclick="setG('${g.id}')">Edit</button></div><div class=s>${num(gS(g))}${g.target?' of '+num(g.target):''}</div>${g.target?bar(pc(gS(g),g.target)):''}<div class=acts style="margin-top:10px"><button class="btn sm" onclick="add({k:'save',tgt:'${g.id}'})">Add money</button></div></div>`).join('')||empty('No goals','Name something you are saving towards.');b+=`<div class=acts><button class="btn pri" onclick="setG()">Add goal</button></div>`}
+if(sub==='debt'){b=S.debts.map(d=>`<div class=row style="cursor:default"><div class=t><b>${esc(d.who)}</b><button class="ghost" style="min-width:auto;min-height:auto;font-size:15px;color:var(--br)" onclick="setD('${d.id}')">Edit</button></div><div class=s>${num(dBal(d))} left of ${num(d.amt)}${d.due?' · due '+d.due:''}</div>${bar(pc(d.amt-dBal(d),d.amt))}${dBal(d)>0?`<div class=acts style="margin-top:10px"><button class="btn sm" onclick="add({k:'debt',tgt:'${d.id}'})">Record repayment</button></div>`:''}</div>`).join('')||empty('No debts','Add money you owe if you want to track repaying it.');b+=`<div class=acts><button class="btn pri" onclick="setD()">Add debt</button></div>`}
+return head()+seg+(sub==='bud'?mn(c):'')+b}
+const nowSel=()=>sel;
+function sett(){const s=S.set;return head()+`<h3 style="margin-top:14px">Settings</h3>
+<label>Currency<input value="${esc(s.cur)}" maxlength="6" onchange="S.set.cur=this.value.trim()||'UGX';save()"></label>
+<label>Month starts on day<input type=number inputmode=numeric min=1 max=28 value="${D()}" onchange="S.set.day=Math.min(28,Math.max(1,+this.value||1));sel=cyc(today());save()"></label>
+<label>Opening balance<input type=number inputmode=decimal value="${s.cash0||''}" placeholder="0" onchange="S.set.cash0=+this.value||0;save()"></label>
+<div class=lab>Privacy</div><div class=acts style="margin-top:0"><button class=btn onclick="setPin()">${s.pin?'Change':'Set'} PIN</button>${s.pin?'<button class="btn red" onclick="S.set.pin=\'\';save()">Remove PIN</button>':''}</div>
+<div class=lab>Your data</div><div class=acts style="margin-top:0"><button class="btn pri" onclick="backup()">Back up</button><label class=btn style="margin:0;text-align:center;color:var(--ink)">Restore<input type=file accept=.json hidden onchange="restore(this.files[0])"></label><button class=btn onclick="csv()">Export CSV</button></div>
+<p class=hint>Everything stays on this phone. Clearing browser data or losing the phone erases it, so back up now and then and keep a copy elsewhere.${s.bk?' Last backup: '+s.bk.slice(0,10)+'.':''}</p>
+<div class=acts><button class="btn red" onclick="wipe()">Erase all data</button></div>`}
+/* sheets */
+const M=$('#modal'),mclose=()=>{M.classList.remove('on');M.onclick=null};M.addEventListener('click',e=>{if(e.target===M)mclose()});
+function add(v0){const e=v0&&v0.id,v={k:'exp',d:today(),amt:'',cat:'',note:'',tgt:'',...v0};
+const rd=()=>{const g=n=>M.querySelector('[name='+n+']');if(g('amt')){v.amt=+g('amt').value||'';v.note=g('note').value;v.d=g('d').value||today()}};
+const draw=()=>{const cs=v.k==='inc'?SRC:[...new Set([...BASE,...S.cats,...(v.k==='exp'&&v.cat?[v.cat]:[])])],tg=v.k==='save'?S.goals.map(g=>[g.id,g.name]):v.k==='debt'?S.debts.filter(d=>dBal(d)>0||d.id===v.tgt).map(d=>[d.id,d.who]):0;
+if(tg){if(!tg.some(x=>x[0]===v.tgt))v.tgt=tg[0]?.[0]||''}else if(!cs.includes(v.cat))v.cat=cs[0];
+const ch=(k,a,extra)=>`<div class=chips>${a.map(([x,y])=>`<button type=button class="chip${v[k]===x?' on':''}" data-k="${k}" data-v="${esc(x)}">${esc(y)}</button>`).join('')}${extra||''}</div>`;
+M.innerHTML=`<div class=sheet role=dialog aria-label="${e?'Edit entry':'New entry'}">${ch('k',Object.entries(KN))}<input name=amt type=number inputmode=decimal placeholder="0" value="${v.amt}" aria-label="Amount"><div class=lab style="margin-top:18px">${tg?(v.k==='save'?'Goal':'Debt'):v.k==='inc'?'From':'Category'}</div>${tg?(tg.length?ch('tgt',tg):`<p class=hint>${v.k==='save'?'Add a goal in Plan first.':'No open debts.'}</p>`):ch('cat',cs.map(x=>[x,x]),v.k==='exp'?'<button type=button class=chip data-new=1>+ New</button>':'')}<label>Note<input name=note value="${esc(v.note)}" placeholder="Optional"></label><label>Date<input name=d type=date value="${v.d}"></label><div class=acts><button class=btn data-x=cancel>Cancel</button>${e?'<button class="btn red" data-x=del>Delete</button>':''}<button class="btn pri" data-x=save>Save</button></div></div>`;M.classList.add('on')};
+M.onclick=ev=>{if(ev.target===M)return mclose();const b=ev.target.closest('button');if(!b)return;
+if(b.dataset.k){rd();v[b.dataset.k]=b.dataset.v;if(b.dataset.k==='k')v.cat='';draw();return}
+if(b.dataset.new){const n=(prompt('New category name')||'').trim();if(n){rd();v.cat=n;draw()}return}
+const x=b.dataset.x;if(x==='cancel')mclose();
+if(x==='del'&&confirm('Delete this entry?')){mclose();S.tx=S.tx.filter(t=>t.id!==v.id);save()}
+if(x==='save'){rd();if(!(v.amt>0))return alert('Enter an amount.');if((v.k==='save'||v.k==='debt')&&!v.tgt)return alert(v.k==='save'?'Add a goal in Plan first.':'No open debts.');
+const t={id:v.id||uid(),k:v.k,d:v.d,amt:v.amt,cat:v.k==='exp'||v.k==='inc'?v.cat:'',note:v.note.trim(),tgt:v.k==='save'||v.k==='debt'?v.tgt:''};
+if(v.k==='exp'&&!BASE.includes(t.cat)&&!S.cats.includes(t.cat))S.cats.push(t.cat);
+mclose();if(e)S.tx[S.tx.findIndex(y=>y.id===v.id)]=t;else S.tx.push(t);save()}};
+draw();if(!e)setTimeout(()=>M.querySelector('[name=amt]')?.focus(),300)}
+const edit=id=>add(S.tx.find(t=>t.id===id));
+function fm(title,fields,v,ok,del){M.innerHTML=`<div class=sheet role=dialog aria-label="${title}"><h3>${title}</h3>${fields.map(([k,l,t])=>`<label>${l}<input name="${k}" type=${t||'text'} ${t==='number'?'inputmode=decimal':''} value="${esc(v[k]||'')}"></label>`).join('')}<div class=acts><button class=btn data-x=cancel>Cancel</button>${del?'<button class="btn red" data-x=del>Delete</button>':''}<button class="btn pri" data-x=save>Save</button></div></div>`;M.classList.add('on');
+M.onclick=e=>{if(e.target===M)return mclose();const x=e.target.dataset.x;if(x==='cancel')mclose();if(x==='del'&&confirm('Delete this?')){mclose();del()}
+if(x==='save'){const o={};fields.forEach(([k,,t])=>{const el=M.querySelector('[name="'+k+'"]');o[k]=t==='number'?(+el.value||0):el.value.trim()});if(ok(o)!==false)mclose()}}}
+function setB(n){const old=n;fm(n?'Edit budget':'New budget',[['cat','Category'],['amt','Monthly limit','number']],n?{cat:n,amt:S.bud[n]}:{},o=>{if(!o.cat||!(o.amt>0))return false;if(old&&old!==o.cat)delete S.bud[old];S.bud[o.cat]=o.amt;if(!BASE.includes(o.cat)&&!S.cats.includes(o.cat))S.cats.push(o.cat);save()},n&&(()=>{delete S.bud[n];save()}))}
+function setG(id){const g=id&&S.goals.find(x=>x.id===id);fm(g?'Edit goal':'New goal',[['name','Name'],['target','Target amount (optional)','number'],['base','Already saved','number']],g||{},o=>{if(!o.name)return false;if(g)Object.assign(g,o);else S.goals.push({id:uid(),...o});save()},g&&(()=>{S.goals=S.goals.filter(x=>x!==g);save()}))}
+function setD(id){const d=id&&S.debts.find(x=>x.id===id);fm(d?'Edit debt':'New debt',[['who','Who you owe'],['amt','Amount','number'],['due','Due date (optional)','date']],d||{},o=>{if(!o.who||!(o.amt>0))return false;if(d)Object.assign(d,o);else S.debts.push({id:uid(),...o});save()},d&&(()=>{S.debts=S.debts.filter(x=>x!==d);save()}))}
+/* data tools */
+const dl=(txt,name,ty)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:ty}));a.download=name;a.click()};
+const backup=()=>{S.set.bk=new Date().toISOString();dl(JSON.stringify(S),'the-v-fi-backup-'+today()+'.json','application/json');save()};
+const restore=f=>{if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.tx||!d.set)throw 0;if(confirm('Replace all current data with this backup?')){S={...DEF(),...d};save()}}catch{alert('This is not a valid backup file.')}};r.readAsText(f)};
+const csv=()=>dl([['date','type','category','note','amount']].concat(S.tx.map(t=>[t.d,KN[t.k],t.cat,t.note,t.amt])).map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\n'),'the-v-fi-entries.csv','text/csv');
+const wipe=()=>{if(confirm('Erase everything on this phone? This cannot be undone.')&&confirm('Really erase all data?')){S=DEF();sel=cyc(today());tab='home';save()}};
+const hash=async p=>{try{return[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode('vfi'+p)))].map(b=>b.toString(16).padStart(2,'0')).join('')}catch{return p}};
+const setPin=async()=>{const p=prompt('Choose a PIN (digits)');if(p){S.set.pin=await hash(p);save()}};
+const unlock=async()=>{if(await hash($('#pin').value)===S.set.pin){$('#lock').classList.remove('on');locked=false;render()}else{$('#pin').value='';$('#pin').placeholder='Wrong PIN'}};
+/* shell */
+const go=t=>{tab=t;render();scrollTo(0,0)};
+function render(){if(locked)return;$('#app').innerHTML={home,act,plan,sett}[tab]();
+$('#nav').innerHTML=[['home','Home'],['act','Activity'],0,['plan','Plan'],['sett','Settings']].map(x=>x?`<button ${tab===x[0]?'aria-current=page':''} onclick="go('${x[0]}')">${x[1]}</button>`:'<button class=plus onclick="add()" aria-label="Add entry">+</button>').join('')}
+(async()=>{S={...DEF(),...(await load()||{})};sel=cyc(today());navigator.storage?.persist?.();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');if(S.set.pin){locked=true;$('#lock').classList.add('on')}render()})();
+</script></body></html>
