@@ -45,7 +45,7 @@ const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()),today
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const sum=(a,f=x=>x.amt)=>a.reduce((s,x)=>s+(+f(x)||0),0),pc=(a,b)=>b>0?Math.min(100,Math.round(a/b*100)):0;
 const DEF=()=>({set:{name:'',cur:'UGX',day:28,cash0:0,pin:'',bk:'',hi:0},tx:[],goals:[],debts:[],bud:{},cats:[]});
-const BASE=['Rent','Food','Transport','Utilities','Internet & data','Church & tithe','Family','Giving','Health','Education','Fun','Other'],GV=['Church & tithe','Family','Giving'],SRC=['Salary','Business','Freelance','Valuation','Graphic design','Music lessons','Gift','Loan','Other'],KN={exp:'Spent',inc:'Received',save:'Saved',debt:'Repaid'};
+const BASE=['Rent','Food','Transport','Utilities','Internet & data','Church & tithe','Family','Giving','Health','Education','Fun','Personal care','Other'],GV=['Church & tithe','Family','Giving'],SRC=['Salary','Business','Freelance','Valuation','Graphic design','Music lessons','Gift','Loan','Other'],KN={exp:'Spent',inc:'Received',save:'Saved',debt:'Repaid'};
 let S=DEF(),tab='home',sub='bud',sel=0,locked=false,qs='';
 const num=n=>Math.round(Math.abs(n||0)).toLocaleString('en-US'),fmt=n=>(n<0?'−':'')+S.set.cur+' '+num(n);
 /* storage */
@@ -55,7 +55,7 @@ async function save(){render();const d=await idb();d.transaction('k','readwrite'
 /* months (a month starts on the payday you choose, default the 1st) */
 const D=()=>Math.min(28,Math.max(1,+S.set.day||1));
 const cyc=d=>{let[y,m,dd]=d.split('-').map(Number);if(dd<D()){m--;if(m<1){m=12;y--}}return y*12+m-1};
-const cl=c=>new Date(Math.floor(c/12),c%12,1).toLocaleString('en',{month:'long',year:'numeric'});
+const cl=c=>{const k=D()>1?c+1:c;return new Date(Math.floor(k/12),k%12,1).toLocaleString('en',{month:'long',year:'numeric'})};
 /* numbers */
 const T=(k,c)=>S.tx.filter(t=>t.k===k&&(c==null||cyc(t.d)===c));
 const cash=()=>+S.set.cash0+sum(T('inc'))-sum(T('exp'))-sum(T('save'))-sum(T('debt'));
