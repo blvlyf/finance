@@ -22,6 +22,7 @@ const aico={
 const tfmt=s=>{s=Math.max(0,Math.round(+s||0));const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return(h?h+':'+pad(m):m)+':'+pad(s%60)};
 const dfmt=c=>new Date(c).toLocaleDateString('en-US',{month:'short',day:'numeric'});
 const smb=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':Math.max(1,Math.round(b/1e6))+' MB';
+const dtx=m=>m.dur?' · '+tfmt(m.dur):'';
 const nsong=n=>n+(n===1?' song':' songs');
 
 /* ---- storage ---- */
@@ -31,14 +32,14 @@ function auLoad(){if(AL||aErr)return aLd||Promise.resolve();
  return aLd=aLd||(async()=>{try{const[l,p,a,s]=await Promise.all(['aulib','aupl','aart','aust'].map(k=>kget(k)));
   if(((l&&l.iv)||(p&&p.iv)||(a&&a.iv))&&!DK)return;
   const L=await aOpen(l),P=await aOpen(p),R=await aOpen(a);AL=Array.isArray(L)?L:[];APL=Array.isArray(P)?P:[];AART=R&&typeof R==='object'&&!Array.isArray(R)?R:{};
-  if(s&&!aCur){const m=AL.find(x=>x.id===s.id);if(m){aCur=m;aAt=s.t||0}}}catch(e){aErr=1}finally{aLd=null;auRefresh();auUI()}})()}
+  if(s&&!aCur){const m=AL.find(x=>x.id===s.id);if(m){aCur=m;aAt=s.t||0}}}catch(e){aErr=1}finally{aLd=null;auRefresh();auUI();setTimeout(aFillDur,1500)}})()}
 const aSave=k=>aQ=aQ.then(async()=>{const m={aulib:AL,aupl:APL,aart:AART}[k];if(m)try{await kput(k,await aSeal(m))}catch(e){console.warn('audio save failed',e)}});
 const aSt=()=>{if(aCur&&aURL)kput('aust',{id:aCur.id,t:A.currentTime||0}).catch(()=>{})};
 async function auPut(id,buf,type){if(DK){const iv=crypto.getRandomValues(new Uint8Array(12));await kput('au:'+id,{enc:1,iv,ct:await crypto.subtle.encrypt({name:'AES-GCM',iv},DK,buf),type})}else await kput('au:'+id,{buf,type})}
 async function auGet(id){const r=await kget('au:'+id);if(!r)return null;const buf=r.enc?await crypto.subtle.decrypt({name:'AES-GCM',iv:r.iv},DK,r.ct):r.buf;return new Blob([buf],{type:r.type})}
 async function auStore(blob,m){const id=uid();try{await auPut(id,await blob.arrayBuffer(),blob.type)}catch(e){try{await kdel('au:'+id)}catch(x){}return 0}
  const r={id,kind:'file',dur:0,size:blob.size,c:Date.now(),type:blob.type,...m};AL.unshift(r);return r}
-const aDur=b=>new Promise(r=>{const t=new Audio(),u=URL.createObjectURL(b),d=v=>{URL.revokeObjectURL(u);r(isFinite(v)?v:0)};t.preload='metadata';t.onloadedmetadata=()=>d(t.duration);t.onerror=()=>d(0);setTimeout(()=>d(0),5000);t.src=u});
+const aDur=(b,ms)=>new Promise(r=>{const t=new Audio(),u=URL.createObjectURL(b),d=v=>{URL.revokeObjectURL(u);r(isFinite(v)?v:0)};t.preload='metadata';t.onloadedmetadata=()=>d(t.duration);t.onerror=()=>d(0);setTimeout(()=>d(0),ms||3000);t.src=u});
 
 /* ---- covers ---- */
 async function aThumb(b){try{const bm=await createImageBitmap(b),s=Math.min(1,320/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(bm.width*s));c.height=Math.max(1,Math.round(bm.height*s));c.getContext('2d').drawImage(bm,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.74)}catch(e){return ''}}
@@ -75,16 +76,20 @@ async function auAdd(files){if(aImp)return;await auLoad();if(!AL){await say('Unl
  auRefresh();
  try{for(const f of L){if(aImp.stop)break;aImp.i++;const base=f.name.replace(/\.[^.]+$/,'').replace(/_/g,' ');aImp.name=base;const e=$('#aimp');if(e)e.outerHTML=aImpH();
   if(ex.has(f.name+'|'+f.size)){dup++;continue}if(f.size>AMAX){big++;continue}
-  const ext=(f.name.split('.').pop()||'').toLowerCase(),type=f.type&&f.type.startsWith('audio/')?f.type:AMT[ext]||'audio/mpeg',b=new Blob([f],{type}),[tg,dur]=await Promise.all([aTags(f),aDur(b)]);
+  const ext=(f.name.split('.').pop()||'').toLowerCase(),type=f.type&&f.type.startsWith('audio/')?f.type:AMT[ext]||'audio/mpeg',b=new Blob([f],{type}),tg=(await wd(aTags(f),8000))||{};
   let title=tg.t||base.replace(/^\d{1,3}[\s.\-]+/,''),artist=tg.a||'';if(!tg.t){const m=title.match(/^(.+?)\s+-\s+(.+)$/);if(m){artist=artist||m[1].trim();title=m[2].trim()}}
   const id0=uid(),al=tg.l||'',ak=al?(al+'|'+(tg.aa||artist)).toLowerCase():'x'+id0;
-  const r=await auStore(b,{name:title||base,ar:artist,al,ak,tr:tg.n||0,fn:f.name,dur:Math.round(dur),type});if(!r){full++;break}
+  const r=await auStore(b,{name:title||base,ar:artist,al,ak,tr:tg.n||0,fn:f.name,dur:0,type});if(!r){full++;break}
   if(tg.p&&!AART[ak]){const d=await aThumb(tg.p);if(d){AART[ak]=d;art=1}}
   ex.add(f.name+'|'+f.size);ok++;if(ok%10===0){aSave('aulib');if(art){aSave('aart');art=0}auRefresh();aImpFix()}}}
- finally{aImp=null;aSave('aulib');aSave('aart');auRefresh()}
+ finally{aImp=null;aSave('aulib');aSave('aart');auRefresh();aFillDur()}
  if(full)await say('There is not enough free storage on this phone for the rest.');
  if(big)await say(big+(big===1?' file was':' files were')+' skipped because they are over 120 MB.');
  toast(ok?'Added '+nsong(ok)+(dup?'. '+dup+' already in your library.':'.'):dup?'Everything was already in your library.':'Nothing was added.')}
+const wd=(p,ms)=>Promise.race([p,new Promise(r=>setTimeout(()=>r(null),ms))]);
+/* lengths are filled in quietly after adding, never blocking it. If the phone will not report them, they are read on first play instead. */
+let aFd=0;async function aFillDur(){if(aFd||!AL)return;aFd=1;let miss=0,n=0;try{for(const m of AL.slice()){if(m.dur||m.nodur||!AL)continue;let b=null;try{b=await auGet(m.id)}catch(e){}
+ const d=b?await aDur(b,2500):0;if(d){m.dur=Math.round(d);miss=0;if(++n%15===0){aSave('aulib');auRefresh()}}else if(++miss>=3){break}}}finally{aFd=0;if(n){aSave('aulib');auRefresh()}}}
 const aImpH=()=>aImp?`<div class=aimp id=aimp><div class=aimt><span>Adding ${aImp.i} of ${aImp.n}</span><button class=ghs onclick="aImp.stop=1">Stop</button></div><div class=aimn>${esc(aImp.name)}</div><i class=aimb style="width:${aImp.n?aImp.i/aImp.n*100:0}%"></i></div>`:'';
 const aImpFix=()=>{const e=$('#aimp');if(e&&aImp)e.outerHTML=aImpH()};
 const auPickF=i=>{const f=[...i.files];i.value='';mclose();auAdd(f)};
@@ -183,7 +188,7 @@ npr.addEventListener('input',()=>{aDrag=1;if(aCur&&isFinite(A.duration))A.curren
 npr.addEventListener('change',()=>{aDrag=0;auPS()});
 A.addEventListener('play',()=>{auUI();auRefresh();clearInterval(aStT);aStT=setInterval(aSt,5000)});A.addEventListener('pause',()=>{auUI();auRefresh();clearInterval(aStT);aSt()});
 A.addEventListener('timeupdate',auTick);A.addEventListener('ratechange',auPS);
-A.addEventListener('loadedmetadata',()=>{if(aAt&&A.src===aURL){try{A.currentTime=aAt}catch(e){}aAt=0}auTick();auPS()});
+A.addEventListener('loadedmetadata',()=>{if(aAt&&A.src===aURL){try{A.currentTime=aAt}catch(e){}aAt=0}if(aCur&&A.src===aURL&&!aCur.dur&&isFinite(A.duration)&&A.duration>0){aCur.dur=Math.round(A.duration);aSave('aulib');auRefresh()}auTick();auPS()});
 A.addEventListener('ended',()=>{if(!aCur||A.src!==aURL)return;if(aRep===2){A.currentTime=0;A.play().catch(()=>{});return}auNext(1,1)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!np.hidden&&!DL.classList.contains('on'))auClose()});
 
@@ -195,7 +200,7 @@ new MutationObserver(()=>{auUI();if(!$('#lock').classList.contains('on')&&!AL)au
 /* ---- track actions ---- */
 const aFind=id=>(AL||[]).find(x=>x.id===id);
 function auMenu(id){const m=aFind(id);if(!m)return;const inPl=auD&&auD.k==='list'&&auD.v!=='fav'&&auT==='lists',v=m.kind==='voice';
- M.innerHTML=`<div class=sheet role=dialog aria-label="Options"><h3>${esc(m.name)}</h3><p class=sub>${esc(m.ar||(v?'Voice note':'Unknown artist'))} · ${tfmt(m.dur)} · ${smb(m.size||0)}</p>
+ M.innerHTML=`<div class=sheet role=dialog aria-label="Options"><h3>${esc(m.name)}</h3><p class=sub>${esc(m.ar||(v?'Voice note':'Unknown artist'))} ${dtx(m)} · ${smb(m.size||0)}</p>
  <button class=mi onclick="mclose();auQAdd('${id}',1)">Play next</button><button class=mi onclick="mclose();auQAdd('${id}',0)">Add to queue</button>
  ${v?'':`<button class=mi onclick="mclose();auFavT('${id}')">${m.fav?'Remove from favorites':'Add to favorites'}</button><button class=mi onclick="auPlPick('${id}')">Add to a playlist</button>`}
  ${inPl?`<button class=mi onclick="mclose();auPlRm('${id}')">Remove from this playlist</button>`:''}
@@ -217,7 +222,7 @@ async function auPlDel(){const p=APL.find(x=>auD&&x.id===auD.v);if(!p||!(await a
 const auTab=t=>{auT=t;auD=null;render()},auOpenD=i=>{auD=aAX[i];scrollTo(0,0);render()},auBack=()=>{auD=null;render()};
 function auSearch(v){aq=v;const e=$('#aul');if(e)e.innerHTML=auRows(auList(),1)}
 function auRow(m){const on=aCur&&aCur.id===m.id,pl=on&&!A.paused;
- return `<div class="aur${on?' on':''}"><button class=aum onclick="auPick('${m.id}')" aria-label="${pl?'Pause':'Play'} ${esc(m.name)}"><span class="cv${pl?' pl':''}">${(()=>{const u=artU(m);return(u?`<img src="${u}" alt="" loading=lazy decoding=async>`:aico.note)+(pl?'<i class=eq><b></b><b></b><b></b></i>':'')})()}</span><span class=aut><span class=aun>${esc(m.name)}</span><span class=aus>${esc(m.ar||(m.kind==='voice'?'Voice note':'Unknown artist'))} · ${tfmt(m.dur)}${m.kind==='voice'?' · '+dfmt(m.c):''}</span></span></button>${m.fav?`<span class=fv aria-label="Favorite">${aico.heart(1)}</span>`:''}<button class=auk onclick="auMenu('${m.id}')" aria-label="Options for ${esc(m.name)}">⋯</button></div>`}
+ return `<div class="aur${on?' on':''}"><button class=aum onclick="auPick('${m.id}')" aria-label="${pl?'Pause':'Play'} ${esc(m.name)}"><span class="cv${pl?' pl':''}">${(()=>{const u=artU(m);return(u?`<img src="${u}" alt="" loading=lazy decoding=async>`:aico.note)+(pl?'<i class=eq><b></b><b></b><b></b></i>':'')})()}</span><span class=aut><span class=aun>${esc(m.name)}</span><span class=aus>${esc(m.ar||(m.kind==='voice'?'Voice note':'Unknown artist'))}${dtx(m)}${m.kind==='voice'?' · '+dfmt(m.c):''}</span></span></button>${m.fav?`<span class=fv aria-label="Favorite">${aico.heart(1)}</span>`:''}<button class=auk onclick="auMenu('${m.id}')" aria-label="Options for ${esc(m.name)}">⋯</button></div>`}
 function auRows(L,div){if(!L.length)return `<p class=sub style="margin:22px 0">${aq&&!auD?'No songs match your search.':'Nothing here yet.'}</p>`;let h='',lt='';for(const m of L){if(div){const c=(m.name[0]||'#').toUpperCase(),k=/[A-Z]/.test(c)?c:'#';if(k!==lt){lt=k;h+=`<div class=alt>${k}</div>`}}h+=auRow(m)}return h}
 const auPlayBar=n=>n?`<div class=aacts><button class="btn pri" onclick="auPlayAll(0)">${aico.play}Play</button><button class=btn onclick="auPlayAll(1)">${aico.shuf}Shuffle</button></div>`:'';
 function auV(){auLoad();aAX=[];
