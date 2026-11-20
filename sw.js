@@ -1,5 +1,5 @@
 /* sw.js: offline cache, update flow, background reminders. Bump V on every release so users get the update prompt. */
-const V='vfi-v4',ASSETS=['./','index.html','style.css','core.js','store.js','ui.js','features.js','app.js','manifest.json','icon-192.png','icon-512.png'];
+const V='vfi-v4',ASSETS=['./','index.html','style.css','core.js','store.js','ui.js','features.js','app.js','audio.js','manifest.json','icon-192.png','icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(ASSETS)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==V).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});
 self.addEventListener('message',e=>{if(e.data==='skip')self.skipWaiting()});
